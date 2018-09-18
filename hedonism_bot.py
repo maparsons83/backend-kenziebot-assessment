@@ -4,6 +4,7 @@ import logging
 import re
 import requests
 import time
+from logging import handlers
 from slackclient import SlackClient
 from settings import SLACK_BOT_TOKEN
 exit_flag = False
@@ -12,7 +13,7 @@ start_time = time.time()
 """custom logger"""
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('slackbot_logs.log')
+file_handler = logging.handlers.RotatingFileHandler('slackbot_logs.log', mode='a', maxBytes=1000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -23,8 +24,10 @@ def receive_signal(sig, stack):
     logger.warning("Received signal: {}".format(sig))
     global exit_flag
     if sig == signal.SIGINT:
+        logger.info('SIGINT detected')
         exit_flag = True
     if sig == signal.SIGTERM:
+        logger.info('SIGTERM detected')
         exit_flag = True
 
 
@@ -86,7 +89,7 @@ def handle_command(command, channel):
     if command.startswith(TEST_COMMAND):
         response = "Stuff is happening"
 
-    if command.startswith('fuck Ryan'):
+    if command.startswith('fuck ryan'):
         response = "<@ryanbot> exit"
 
     if command.startswith('ping'):
@@ -131,5 +134,5 @@ if __name__ == "__main__":
                 logger.exception('Unhandled exception: {}'.format(exc))
                 time.sleep(5)
     else:
-        logger.debug("Failed to connect")
+        logger.error("Failed to connect")
         print("Connection failed. Exception traceback printed above.")
