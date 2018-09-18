@@ -1,6 +1,5 @@
-import os
 import signal
-import logging 
+import logging
 import re
 import requests
 import time
@@ -13,11 +12,13 @@ start_time = time.time()
 """custom logger"""
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-file_handler = logging.handlers.RotatingFileHandler('slackbot_logs.log', mode='a', maxBytes=1000, backupCount=5)
+file_handler = logging.handlers.RotatingFileHandler(
+    'slackbot_logs.log', mode='a', maxBytes=1000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 searched_files = {}
+
 
 def receive_signal(sig, stack):
     """Listener for SIGINT and SIGTERM"""
@@ -37,19 +38,23 @@ slack_client = SlackClient(SLACK_BOT_TOKEN)
 starterbot_id = None
 
 # constants
-RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
+RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
 TEST_COMMAND = "test"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+
 
 def command_clean(str):
     low_str = str.lower()
     new_str = ' '.join(low_str.split())
     return new_str
 
+
 def parse_bot_commands(slack_events):
     """
-        Parses a list of events coming from the Slack RTM API to find bot commands.
-        If a bot command is found, this function returns a tuple of command and channel.
+        Parses a list of events coming from
+        the Slack RTM API to find bot commands.
+        If a bot command is found, this function
+        returns a tuple of command and channel.
         If its not found, then this function returns None, None.
     """
     for event in slack_events:
@@ -59,14 +64,20 @@ def parse_bot_commands(slack_events):
                 return message, event["channel"]
     return None, None
 
+
 def parse_direct_mention(message_text):
     """
-        Finds a direct mention (a mention that is at the beginning) in message text
-        and returns the user ID which was mentioned. If there is no direct mention, returns None
+        Finds a direct mention
+        (a mention that is at the beginning) in message text
+        and returns the user ID which was mentioned.
+        If there is no direct mention, returns None
     """
     matches = re.search(MENTION_REGEX, message_text)
-    # the first group contains the username, the second group contains the remaining message
-    return (matches.group(1), matches.group(2).strip()) if matches else (None, None)
+    # the first group contains the username,
+    # the second group contains the remaining message
+    return (matches.group(1),
+            matches.group(2).strip()) if matches else (None, None)
+
 
 def handle_command(command, channel):
     command = command_clean(command)
@@ -84,8 +95,9 @@ def handle_command(command, channel):
     global start_time
 
     if command.startswith('help'):
-        response = "Try one of these delicious commands: \n`{}`\n`{}`\n`{}`".format(PING_COMMAND, EXIT_COMMAND, DAD_JOKE)
-    
+        response = "Try one of these delicious commands: \n`{}`\n`{}`\n`{}`".format(
+            PING_COMMAND, EXIT_COMMAND, DAD_JOKE)
+
     if command.startswith(TEST_COMMAND):
         response = "Stuff is happening"
 
@@ -99,7 +111,7 @@ def handle_command(command, channel):
         r = requests.get('https://icanhazdadjoke.com/slack')
         joke = r.json()
         response = joke['attachments'][0]['text']
-    
+
     if command.startswith('exit'):
         global exit_flag
         response = "I'll be upstairs...putting batteries in things"
@@ -111,6 +123,7 @@ def handle_command(command, channel):
         channel=channel,
         text=response or default_response
     )
+
 
 if __name__ == "__main__":
     channel_test_url = 'https://hooks.slack.com/services/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'
