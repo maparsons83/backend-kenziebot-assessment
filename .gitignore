@@ -1,0 +1,6 @@
+hedonism-bot1/
+.vscode/
+__pycache__/
+.env
+tests/
+.pytest_cache
