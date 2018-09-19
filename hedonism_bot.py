@@ -12,7 +12,7 @@ start_time = time.time()
 """custom logger"""
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-file_handler = logging.handlers.RotatingFileHandler(
+file_handler = handlers.RotatingFileHandler(
     'slackbot_logs.log', mode='a', maxBytes=1000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
 file_handler.setFormatter(formatter)
@@ -58,7 +58,7 @@ def parse_bot_commands(slack_events):
         If its not found, then this function returns None, None.
     """
     for event in slack_events:
-        if event["type"] == "message" and not "subtype" in event:
+        if event["type"] == "message" and "subtype" not in event:
             user_id, message = parse_direct_mention(event["text"])
             if user_id == starterbot_id:
                 return message, event["channel"]
@@ -95,8 +95,9 @@ def handle_command(command, channel):
     global start_time
 
     if command.startswith('help'):
-        response = "Try one of these delicious commands: \n`{}`\n`{}`\n`{}`".format(
-            PING_COMMAND, EXIT_COMMAND, DAD_JOKE)
+        response = (
+            "Try one of these delicious commands:\n`{}`\n`{}`\n`{}`".format(
+                    PING_COMMAND, EXIT_COMMAND, DAD_JOKE))
 
     if command.startswith(TEST_COMMAND):
         response = "Stuff is happening"
