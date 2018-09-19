@@ -10,7 +10,7 @@ mccabe==0.6.1
 more-itertools==4.3.0
 pluggy==0.7.1
 py==1.6.0
-pylint==2.1.1
+pylint
 pytest==3.8.0
 python-dotenv==0.9.1
 requests==2.19.1
